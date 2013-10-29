@@ -284,6 +284,10 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
             NSURL *url = [[notification userInfo] valueForKey:kAFApplicationLaunchOptionsURLKey];
 
             currentRequestToken.verifier = [AFParametersFromQueryString([url query]) valueForKey:@"oauth_verifier"];
+            if (currentRequestToken.verifier == nil) {
+                failure([NSError errorWithDomain:@"Oauth Authorization" code:401 userInfo:@{@"Access Denied":@"User denied access"}]);
+                return;
+            }
 
             [self acquireOAuthAccessTokenWithPath:accessTokenPath requestToken:currentRequestToken accessMethod:accessMethod success:^(AFOAuth1Token * accessToken, id responseObject) {
                 self.applicationLaunchNotificationObserver = nil;
